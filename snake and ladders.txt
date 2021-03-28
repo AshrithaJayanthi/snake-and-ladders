@@ -1,0 +1,171 @@
+import random
+import time
+import sys
+
+# for better understanding add a time lapse of 1 second before the next action.
+time_lapse = 1
+face_max_val = 6
+board_max_val = 100
+
+# when there's a snake bite you move from 'key' to 'value'.
+snakes = {
+   17: 7,
+    54: 34,
+    62: 19,
+    64: 60,
+    87: 36,
+    93: 73,
+    95: 75,
+    98: 79
+}
+
+# when there's a ladder you move from 'key' to 'value'
+ladders = {
+    4: 14 ,
+    9: 31,
+    21: 42,
+    28: 84,
+    51: 67,
+    72: 91,
+    80: 99
+}
+
+player_turn_text = [
+    "come on its your turn.",
+    "Go gooo.",
+    "Please proceed with the game.",
+    "Lets win this yikes.",
+    "Are you ready to smash the game?",
+    
+]
+
+snake_bite_text = [
+    "oops..",
+    "bummerrrrr",
+    "sorry looks like someone got a snake bite :|",
+    "oh nooo :(",
+    "dang it! :/"
+]
+
+ladder_jump_text = [
+    "woohoo :)",
+    "voilaaa :)",
+    "nailed it ;)",
+    "oh myyy ... :0",
+    "yaayyy :D"
+]
+
+
+def welcome_text():
+    text = """
+   ^_^ Welcome to Snake and Ladder Game ^_^.
+ 
+
+    Rules to be followed:
+      1. Initially both the players are at the position 0 on the board. 
+         Each player gets to roll the dice and move forward. 
+         Move forward the number of spaces shown on the dice.
+      2. If your dice lands on a ladder, you can move up to the top of the ladder :D.
+      3. But If your dice lands on the head of a snake, you must slide down to the bottom of the snake :(.
+      4. The first player who goes to the FINAL POSITION is the winner of the game.
+      5. TO ROLL THE DICE PLEASE PRESS "ENTER".
+
+    """
+    print(text)
+
+
+def get_player_names():
+    player1_name = None
+    while not player1_name:
+        player1_name = input("HEY! enter a name for first player: ").strip()
+
+    player2_name = None
+    while not player2_name:
+        player2_name = input("HEY! enter a name for second player: ").strip()
+
+    print("\n Match will be played between '" + player1_name + "' and '" + player2_name + "'\n")
+    return player1_name, player2_name
+
+
+def get_dice_value():
+    time.sleep(time_lapse)
+    dice_value = random.randint(1, face_max_val)
+    print("Its a " + str(dice_value))
+    return dice_value
+
+
+def got_snake_bite_text(old_value, current_value, player_name):
+    print("\n" + random.choice(snake_bite_text).upper() + " ~~>")
+    print("\n" + player_name + " got a snake bite ://. Down from " + str(old_value) + " to " + str(current_value))
+
+
+def got_ladder_jump_text(old_value, current_value, player_name):
+    print("\n" + random.choice(ladder_jump_text).upper() + " ########")
+    print("\n" + player_name + " climbed the ladder :) from " + str(old_value) + " to " + str(current_value))
+
+
+def snake_ladder(player_name, current_value, dice_value):
+    time.sleep(time_lapse)
+    old_value = current_value
+    current_value = current_value + dice_value
+
+    if current_value > board_max_val:
+        print("Come on.. You need " + str(board_max_val - old_value) + " to win this game. Keep trying...")
+        return old_value
+
+    print("\n" + player_name + " moved from " + str(old_value) + " to " + str(current_value))
+    if current_value in snakes:
+        final_value = snakes.get(current_value)
+        got_snake_bite_text(current_value, final_value, player_name)
+
+    elif current_value in ladders:
+        final_value = ladders.get(current_value)
+        got_ladder_jump_text(current_value, final_value, player_name)
+
+    else:
+        final_value = current_value
+
+    return final_value
+
+
+def find_winner(player_name, position):
+    time.sleep(time_lapse)
+    if board_max_val == position:
+        print("\n\n\nVOILAAAA..\n\n" + player_name + " won the game.")
+        print("Congratulations " + player_name)
+
+        sys.exit(1)
+
+
+def start_game():
+    welcome_text()
+    time.sleep(time_lapse)
+    player1_name, player2_name = get_player_names()
+    time.sleep(time_lapse)
+
+    player1_current_position = 0
+    player2_current_position = 0
+
+    while True:
+        time.sleep(time_lapse)
+        input_1 = input("\n" + player1_name + ": " + random.choice(player_turn_text) + " Hit the enter to roll dice: ")
+        print("\nRolling dice...")
+        dice_value = get_dice_value()
+        time.sleep(time_lapse)
+        print(player1_name + " moving....")
+        player1_current_position = snake_ladder(player1_name, player1_current_position, dice_value)
+
+        find_winner(player1_name, player1_current_position)
+
+        input_2 = input("\n" + player2_name + ": " + random.choice(player_turn_text) + " Hit the enter to roll dice: ")
+        print("\nRolling dice...")
+        dice_value = get_dice_value()
+        time.sleep(time_lapse)
+        print(player2_name + " moving....")
+        player2_current_position = snake_ladder(player2_name, player2_current_position, dice_value)
+
+        find_winner(player2_name, player2_current_position)
+
+
+if _name_ == "_main_":
+    start_game()
